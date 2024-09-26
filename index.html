@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GitRepoCloner</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center">Git Repository Cloner</h2>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form id="cloneForm">
+                        <div class="form-group">
+                            <label for="gitUrl">Git Repository URL: </label>
+                            <input type="url" id="gitUrl" class="form-control" placeholder="Enter Git repository URL" required/>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="branchName">Branch Name: </label>
+                            <input type="text" id="branchName" class="form-control" placeholder="Enter Branch name" required/>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="personalToken">Git Personal Access Token: </label>
+                            <input type="text" id="personalToken" class="form-control" placeholder="Enter your GitHub personal access token" required/>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 w-40">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('cloneForm').addEventListener('submit', function(e) {
+        e.preventDefault();  // Prevent form from submitting the traditional way
+
+        const gitUrl = document.getElementById('gitUrl').value;
+        const branchName = document.getElementById('branchName').value;
+        const personalToken = document.getElementById('personalToken').value;
+
+        if (gitUrl && branchName && personalToken) {
+            const postData = {
+                repo_name: gitUrl,
+                new_branch: branchName,
+                personalToken: personalToken
+            };
+
+            // Submit the form using a POST request (you can send it to your backend)
+            fetch('/generate_explanations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    swal("Success!", "Repository has been cloned successfully!", "success");
+                } else {
+                    swal("Error!", "Something went wrong while cloning the repository.", "error");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                swal("Error!", "An error occurred during the request.", "error");
+            });
+        } else {
+            swal("Error!", "All fields are required.", "error");
+        }
+    });
+</script>
+</body>
+</html>
